@@ -6,6 +6,8 @@ export type Book = {
     author: string;
     isbn: string;
     category: string;
+    averageRating: number;
+    ratingsCount: number;
 };
 
 export type Review = {

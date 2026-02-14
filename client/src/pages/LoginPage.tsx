@@ -14,7 +14,7 @@ export function LoginPage() {
 
     const sp = new URLSearchParams(loc.search);
     const rawNext = sp.get("next") ?? "";
-    const from = rawNext.startsWith("/app/") ? rawNext : "/app/books";
+    const next = rawNext.startsWith("/app/") ? rawNext : "/app/books";
 
     const login = useLogin();
     const [username, setUsername] = useState("");
@@ -33,7 +33,8 @@ export function LoginPage() {
         e.preventDefault();
         try {
             await login.mutateAsync({ username, password });
-            nav(from, { replace: true });
+            toast.success("Logged in");
+            nav(next, { replace: true });
         } catch (err: unknown) {
             toast.error(getErrorMessage(err));
         }

@@ -20,7 +20,7 @@ function getErrorMessage(err: unknown): string {
     if (typeof err === "object" && err && "message" in err) {
         return String((err as { message: unknown }).message);
     }
-    return "Unknown error";
+    return "Something went wrong. Please try again.";
 }
 
 export function BookDetailPage() {
@@ -56,7 +56,6 @@ export function BookDetailPage() {
     const [rating, setRating] = useState<number>(0);
     const [text, setText] = useState<string>("");
 
-    // Keep the form in sync with async review load (without clobbering user edits mid-typing).
     useEffect(() => {
         if (!myReview) {
             setRating(0);
@@ -75,14 +74,12 @@ export function BookDetailPage() {
                 body: JSON.stringify(input),
             }),
         onSuccess: async () => {
-            await Promise.all([
-                qc.invalidateQueries({ queryKey: qk.book(bookId) }),
-                qc.invalidateQueries({ queryKey: qk.reviews(bookId) }),
-            ]);
-            toast.success("Saved");
+            await qc.invalidateQueries({ queryKey: qk.reviews(bookId) });
+            await qc.invalidateQueries({ queryKey: qk.book(bookId) });
+            toast.success("Review saved");
         },
         onError: (e: unknown) => {
-            toast.error(getErrorMessage(e) || "Save failed");
+            toast.error(getErrorMessage(e));
         },
     });
 
@@ -94,14 +91,11 @@ export function BookDetailPage() {
         onSuccess: async () => {
             setRating(0);
             setText("");
-            await Promise.all([
-                qc.invalidateQueries({ queryKey: qk.book(bookId) }),
-                qc.invalidateQueries({ queryKey: qk.reviews(bookId) }),
-            ]);
-            toast.success("Deleted");
+            await qc.invalidateQueries({ queryKey: qk.reviews(bookId) });
+            await qc.invalidateQueries({ queryKey: qk.book(bookId) });
+            toast.success("Review deleted");
         },
-        onError: (e: unknown) =>
-            toast.error(getErrorMessage(e) || "Delete failed"),
+        onError: (e: unknown) => toast.error(getErrorMessage(e)),
     });
 
     if (!bookId)
@@ -122,6 +116,7 @@ export function BookDetailPage() {
         return (
             <EmptyState
                 title="Failed to load book"
+                description="Please try again."
                 actionLabel="Back to books"
                 onAction={() => nav("/app/books")}
             />
@@ -216,7 +211,7 @@ export function BookDetailPage() {
                         <Button
                             onClick={() => {
                                 if (!rating) {
-                                    toast.error("Rating is required");
+                                    toast.error("Please select a star rating.");
                                     return;
                                 }
                                 save.mutate({ rating, text });

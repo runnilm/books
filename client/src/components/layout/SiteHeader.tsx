@@ -1,9 +1,6 @@
 import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
 import { ThemeToggle } from "@/components/layout/ThemeToggle";
-import { useSidebar } from "./sidebar-context";
 import { BookCommand } from "../books/BookCommand";
-import { PanelLeft } from "lucide-react";
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -13,9 +10,9 @@ import {
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { useLogout, useMe } from "@/lib/auth";
 import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
 
 export function SiteHeader() {
-    const { toggle } = useSidebar();
     const me = useMe();
     const logout = useLogout();
     const nav = useNavigate();
@@ -23,27 +20,12 @@ export function SiteHeader() {
     return (
         <header className="sticky top-0 z-40 border-b bg-background/80 backdrop-blur">
             <div className="flex h-14 w-full items-center gap-3 px-4">
-                {/* Left */}
-                <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={toggle}
-                    aria-label="Toggle sidebar"
-                >
-                    <PanelLeft className="h-5 w-5" />
-                </Button>
-
-                <Separator orientation="vertical" className="h-6" />
-
-                {/* Center */}
-                <div className="flex min-w-0 flex-1 justify-center">
-                    <div className="w-full max-w-2xl">
-                        <BookCommand />
-                    </div>
+                {/* Far-left search */}
+                <div className="w-full max-w-2xl">
+                    <BookCommand />
                 </div>
 
-                {/* Right */}
-                <div className="flex items-center gap-2">
+                <div className="ml-auto flex items-center gap-2">
                     <ThemeToggle />
 
                     <DropdownMenu>
@@ -67,6 +49,7 @@ export function SiteHeader() {
                             <DropdownMenuItem
                                 onClick={async () => {
                                     await logout.mutateAsync();
+                                    toast.success("Logged out");
                                     nav("/app/login", { replace: true });
                                 }}
                             >

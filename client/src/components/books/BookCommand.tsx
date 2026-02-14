@@ -86,7 +86,7 @@ export function BookCommand() {
                 <CommandInput
                     value={q}
                     onValueChange={setQ}
-                    placeholder="Type title, author, or ISBN..."
+                    placeholder="Type title, author, ISBN, or category..."
                 />
                 <CommandList>
                     <CommandEmpty>
@@ -95,7 +95,7 @@ export function BookCommand() {
                     {items.map((b) => (
                         <CommandItem
                             key={b.id}
-                            value={`${b.title} ${b.author} ${b.isbn}`}
+                            value={`${b.title} ${b.author} ${b.isbn} ${b.category}`}
                             onSelect={() => {
                                 setOpen(false);
                                 nav(`/app/books/${b.id}`);
@@ -106,7 +106,7 @@ export function BookCommand() {
                                     {b.title}
                                 </div>
                                 <div className="truncate text-xs text-muted-foreground">
-                                    {b.author} • {b.isbn}
+                                    {b.author} • {b.isbn} • {b.category}
                                 </div>
                             </div>
                         </CommandItem>

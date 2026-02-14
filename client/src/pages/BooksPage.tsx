@@ -57,6 +57,11 @@ export function BooksPage() {
         return p;
     }, [dq, category]);
 
+    const categoriesQ = useQuery({
+        queryKey: qk.bookCategories,
+        queryFn: () => apiFetch<{ categories: string[] }>(API.books.categories),
+    });
+
     const booksQ = useQuery({
         queryKey: qk.books(params),
         queryFn: async () => {
@@ -67,35 +72,34 @@ export function BooksPage() {
     });
 
     const books = booksQ.data?.books ?? [];
+    const categories = categoriesQ.data?.categories ?? [];
 
     return (
         <div className="space-y-4">
-            <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-                <div className="space-y-2 flex-1">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-end">
+                <div className="space-y-2 sm:flex-[2]">
                     <Label htmlFor="q">Search</Label>
                     <Input
                         id="q"
-                        placeholder="Title, author, or ISBN..."
+                        placeholder="Title, author, ISBN, or category..."
                         value={q}
                         onChange={(e) => setQ(e.target.value)}
                     />
                 </div>
 
-                <div className="space-y-2 sm:w-64">
+                <div className="space-y-2 sm:flex-1">
                     <Label>Category</Label>
                     <Select value={category} onValueChange={setCategory}>
-                        <SelectTrigger>
+                        <SelectTrigger className="w-full">
                             <SelectValue placeholder="All categories" />
                         </SelectTrigger>
                         <SelectContent>
                             <SelectItem value="all">All</SelectItem>
-                            {/* Replace with real categories if your API provides them */}
-                            <SelectItem value="Fiction">Fiction</SelectItem>
-                            <SelectItem value="Nonfiction">
-                                Nonfiction
-                            </SelectItem>
-                            <SelectItem value="Sci-Fi">Sci-Fi</SelectItem>
-                            <SelectItem value="Fantasy">Fantasy</SelectItem>
+                            {categories.map((c) => (
+                                <SelectItem key={c} value={c}>
+                                    {c}
+                                </SelectItem>
+                            ))}
                         </SelectContent>
                     </Select>
                 </div>

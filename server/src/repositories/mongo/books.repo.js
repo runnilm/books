@@ -16,7 +16,12 @@ export const booksRepo = {
             const re = new RegExp(escapeRegex(qText), "i");
             mongoQuery = {
                 ...filter,
-                $or: [{ title: re }, { author: re }, { isbn: re }],
+                $or: [
+                    { title: re },
+                    { author: re },
+                    { isbn: re },
+                    { category: re },
+                ],
             };
         }
 
@@ -24,6 +29,14 @@ export const booksRepo = {
             .sort({ added_at: -1 })
             .skip(offset)
             .limit(limit);
+    },
+
+    async listCategories() {
+        const categories = await Book.distinct("category");
+        return (categories ?? [])
+            .map((c) => String(c))
+            .filter((c) => c.trim().length > 0)
+            .sort((a, b) => a.localeCompare(b));
     },
 
     async findByIds(ids) {

@@ -33,6 +33,7 @@ export function RegisterPage() {
         e.preventDefault();
         try {
             await register.mutateAsync({ username, password });
+            toast.success("Account created");
             nav(next, { replace: true });
         } catch (err: unknown) {
             toast.error(getErrorMessage(err));

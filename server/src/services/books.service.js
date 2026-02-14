@@ -10,16 +10,49 @@ export function booksService({ booksRepo, reviewsRepo, collectionBooks }) {
 
             const book = await booksRepo.findById(id);
             if (!book) throw new ApiError(404, "Not found.");
-            return book;
+
+            const stats = await reviewsRepo.statsByBookId(id);
+
+            const o =
+                typeof book.toObject === "function" ? book.toObject() : book;
+            return {
+                ...o,
+                averageRating: stats.average,
+                ratingsCount: stats.count,
+            };
         },
 
         async list({ q, category, limit, offset }) {
-            return booksRepo.list({ q, category, limit, offset });
+            const docs = await booksRepo.list({ q, category, limit, offset });
+            const ids = docs.map((d) => String(d._id));
+            const statsMap = await reviewsRepo.statsByBookIds(ids);
+
+            return docs.map((d) => {
+                const o = typeof d.toObject === "function" ? d.toObject() : d;
+                const stats = statsMap.get(String(o._id)) ?? {
+                    average: 0,
+                    count: 0,
+                };
+                return {
+                    ...o,
+                    averageRating: stats.average,
+                    ratingsCount: stats.count,
+                };
+            });
+        },
+
+        async categories() {
+            return booksRepo.listCategories();
         },
 
         async create({ book }) {
             try {
-                return await booksRepo.create(book);
+                const created = await booksRepo.create(book);
+                const o =
+                    typeof created.toObject === "function"
+                        ? created.toObject()
+                        : created;
+                return { ...o, averageRating: 0, ratingsCount: 0 };
             } catch (err) {
                 if (err?.code === 11000)
                     throw new ApiError(409, "ISBN already exists.");
@@ -33,7 +66,17 @@ export function booksService({ booksRepo, reviewsRepo, collectionBooks }) {
 
             const updated = await booksRepo.updateById(id, patch);
             if (!updated) throw new ApiError(404, "Not found.");
-            return updated;
+
+            const stats = await reviewsRepo.statsByBookId(id);
+            const o =
+                typeof updated.toObject === "function"
+                    ? updated.toObject()
+                    : updated;
+            return {
+                ...o,
+                averageRating: stats.average,
+                ratingsCount: stats.count,
+            };
         },
 
         async remove({ id }) {

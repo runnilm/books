@@ -11,6 +11,7 @@ export function useMe() {
     return useQuery({
         queryKey: qk.me,
         queryFn: () => apiFetch<MeResponse>(API.auth.me),
+        staleTime: 0,
     });
 }
 
@@ -22,8 +23,10 @@ export function useLogin() {
                 method: "POST",
                 body: JSON.stringify(input),
             }),
-        onSuccess: async () => {
+        onSuccess: async (data) => {
+            qc.setQueryData(qk.me, { user: data.user } satisfies MeResponse);
             await qc.invalidateQueries({ queryKey: qk.me });
+            await qc.refetchQueries({ queryKey: qk.me });
         },
     });
 }
@@ -36,8 +39,10 @@ export function useRegister() {
                 method: "POST",
                 body: JSON.stringify(input),
             }),
-        onSuccess: async () => {
+        onSuccess: async (data) => {
+            qc.setQueryData(qk.me, { user: data.user } satisfies MeResponse);
             await qc.invalidateQueries({ queryKey: qk.me });
+            await qc.refetchQueries({ queryKey: qk.me });
         },
     });
 }
@@ -47,6 +52,7 @@ export function useLogout() {
     return useMutation({
         mutationFn: () => apiFetch<void>(API.auth.logout, { method: "POST" }),
         onSuccess: async () => {
+            qc.setQueryData(qk.me, { user: null } satisfies MeResponse);
             await qc.invalidateQueries({ queryKey: qk.me });
             qc.clear();
         },

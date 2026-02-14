@@ -8,6 +8,8 @@ export function booksController({ books }) {
             author: o.author,
             isbn: o.isbn,
             category: o.category,
+            averageRating: Number(o.averageRating ?? 0),
+            ratingsCount: Number(o.ratingsCount ?? 0),
         };
     }
 
@@ -20,6 +22,11 @@ export function booksController({ books }) {
         list: async (req, res) => {
             const booksList = await books.list(req.validated.query);
             res.json({ books: booksList.map(serializeBook) });
+        },
+
+        categories: async (_req, res) => {
+            const categories = await books.categories();
+            res.json({ categories });
         },
 
         create: async (req, res) => {

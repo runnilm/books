@@ -30,6 +30,8 @@ const updateBody = z
 export function booksRoutes({ controller }) {
     const router = Router();
 
+    router.get("/categories", asyncHandler(controller.categories));
+
     router.get(
         "/",
         asyncHandler(async (req, res) => {

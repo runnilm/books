@@ -6,15 +6,16 @@ export const API = {
         logout: "/api/auth/logout",
     },
     books: {
-        list: "/api/books", // GET ?q=&category=
-        detail: (id: string) => `/api/books/${id}`, // GET
-        search: "/api/books/search", // GET ?q=&category=&limit=&offset=
+        list: "/api/books",
+        categories: "/api/books/categories",
+        detail: (id: string) => `/api/books/${id}`,
+        search: "/api/books/search",
     },
     reviews: {
-        listForBook: (bookId: string) => `/api/books/${bookId}/reviews`, // GET
-        ratingsForBook: (bookId: string) => `/api/books/${bookId}/ratings`, // GET
-        upsertForBook: (bookId: string) => `/api/books/${bookId}/reviews`, // POST
+        listForBook: (bookId: string) => `/api/books/${bookId}/reviews`,
+        ratingsForBook: (bookId: string) => `/api/books/${bookId}/ratings`,
+        upsertForBook: (bookId: string) => `/api/books/${bookId}/reviews`,
         deleteMineForBook: (bookId: string) =>
-            `/api/books/${bookId}/reviews/me`, // DELETE
+            `/api/books/${bookId}/reviews/me`,
     },
 } as const;

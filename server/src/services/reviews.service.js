@@ -9,7 +9,7 @@ function serializeReview(doc, username = "") {
             id: Number(o?.user_id),
             username,
         },
-        rating: o?.rating,
+        rating: Number(o?.rating ?? 0),
         text: o?.text ?? "",
         createdAt: o?.created_at ? new Date(o.created_at).toISOString() : null,
         updatedAt: o?.updated_at ? new Date(o.updated_at).toISOString() : null,

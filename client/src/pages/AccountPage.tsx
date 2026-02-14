@@ -2,6 +2,7 @@ import { useNavigate } from "react-router-dom";
 import { useLogout, useMe } from "@/lib/auth";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { toast } from "sonner";
 
 export function AccountPage() {
     const me = useMe();
@@ -25,6 +26,7 @@ export function AccountPage() {
                     disabled={logout.isPending}
                     onClick={async () => {
                         await logout.mutateAsync();
+                        toast.success("Logged out");
                         nav("/app/login", { replace: true });
                     }}
                 >
