@@ -1,143 +1,133 @@
 import { useEffect, useMemo, useState } from "react";
-import { Link, useSearchParams } from "react-router-dom";
+import { useSearchParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import { booksApi } from "@/api/booksApi";
+import { apiFetch } from "@/lib/api";
+import { qk } from "@/lib/queryKeys";
+import { API } from "@/lib/endpoints";
+import type { Book } from "@/types/api";
 import { Input } from "@/components/ui/input";
-import { Select } from "@/components/ui/select";
+import { Label } from "@/components/ui/label";
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Alert } from "@/components/ui/alert";
-import { useDebouncedValue } from "@/lib/debounce";
-import { ApiError } from "@/api/fetchJson";
+import { EmptyState } from "@/components/common/EmptyState";
 import { BookCard } from "@/components/books/BookCard";
 
-function normalizeParam(v: string | null): string {
-    return (v ?? "").trim();
-}
-
-function setOrDelete(sp: URLSearchParams, key: string, value: string) {
-    const v = value.trim();
-    if (v) sp.set(key, v);
-    else sp.delete(key);
+function useDebounced<T>(value: T, ms: number) {
+    const [v, setV] = useState(value);
+    useEffect(() => {
+        const t = setTimeout(() => setV(value), ms);
+        return () => clearTimeout(t);
+    }, [value, ms]);
+    return v;
 }
 
 export function BooksPage() {
-    const [searchParams, setSearchParams] = useSearchParams();
+    const [sp, setSp] = useSearchParams();
+    const initialQ = sp.get("q") ?? "";
+    const initialCategory = sp.get("category") ?? "all";
 
-    const qParam = normalizeParam(searchParams.get("q"));
-    const categoryParam = normalizeParam(searchParams.get("category"));
+    const [q, setQ] = useState(initialQ);
+    const [category, setCategory] = useState(initialCategory);
+    const dq = useDebounced(q, 250);
 
-    const [qInput, setQInput] = useState(qParam);
-    const [categoryInput, setCategoryInput] = useState(categoryParam);
-
-    useEffect(() => setQInput(qParam), [qParam]);
-    useEffect(() => setCategoryInput(categoryParam), [categoryParam]);
-
-    const q = useDebouncedValue(qInput, 300);
-    const category = categoryInput;
-
+    // URL sync
     useEffect(() => {
-        const next = new URLSearchParams(searchParams);
-        setOrDelete(next, "q", q);
-        setOrDelete(next, "category", category);
-        setSearchParams(next, { replace: true });
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [q, category]);
+        const next = new URLSearchParams(sp);
+        const qv = dq.trim();
+        if (qv) next.set("q", qv);
+        else next.delete("q");
 
-    const { data, isLoading, error, isFetching } = useQuery({
-        queryKey: ["books", { q, category }],
-        queryFn: () => booksApi.list({ q, category }),
-        staleTime: 30_000,
+        if (category !== "all") next.set("category", category);
+        else next.delete("category");
+
+        setSp(next, { replace: true });
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [dq, category]);
+
+    const params = useMemo(() => {
+        const p: Record<string, string> = {};
+        if (dq.trim()) p.q = dq.trim();
+        if (category !== "all") p.category = category;
+        return p;
+    }, [dq, category]);
+
+    const booksQ = useQuery({
+        queryKey: qk.books(params),
+        queryFn: async () => {
+            const qs = new URLSearchParams(params).toString();
+            const url = `${API.books.list}${qs ? `?${qs}` : ""}`;
+            return apiFetch<{ books: Book[] }>(url);
+        },
     });
 
-    const books = useMemo(() => data ?? [], [data]);
-
-    const categories = useMemo(() => {
-        const s = new Set<string>();
-        for (const b of books) s.add(b.category);
-        return ["", ...Array.from(s).sort()];
-    }, [books]);
-
-    const errMsg =
-        error instanceof ApiError
-            ? error.message
-            : error
-              ? "Failed to load books."
-              : null;
+    const books = booksQ.data?.books ?? [];
 
     return (
-        <div className="py-6">
-            <div className="flex items-center justify-between gap-4">
-                <div>
-                    <h1 className="text-xl font-semibold">Books</h1>
-                    <p className="text-sm opacity-70 mt-1">
-                        Browse and search the catalog.
-                    </p>
-                </div>
-                {isFetching && !isLoading && (
-                    <div className="text-xs opacity-60">Updating…</div>
-                )}
-            </div>
-
-            <div className="mt-6 grid gap-3 sm:grid-cols-2">
-                <div>
-                    <label className="text-sm font-medium">Search</label>
-                    <div className="mt-1">
-                        <Input
-                            placeholder="Title, author, ISBN…"
-                            value={qInput}
-                            onChange={(e) => setQInput(e.target.value)}
-                        />
-                    </div>
+        <div className="space-y-4">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+                <div className="space-y-2 flex-1">
+                    <Label htmlFor="q">Search</Label>
+                    <Input
+                        id="q"
+                        placeholder="Title, author, or ISBN..."
+                        value={q}
+                        onChange={(e) => setQ(e.target.value)}
+                    />
                 </div>
 
-                <div>
-                    <label className="text-sm font-medium">Category</label>
-                    <div className="mt-1">
-                        <Select
-                            value={categoryInput}
-                            onChange={(e) => setCategoryInput(e.target.value)}
-                        >
-                            <option value="">All</option>
-                            {categories
-                                .filter((c) => c)
-                                .map((c) => (
-                                    <option key={c} value={c}>
-                                        {c}
-                                    </option>
-                                ))}
-                        </Select>
-                    </div>
+                <div className="space-y-2 sm:w-64">
+                    <Label>Category</Label>
+                    <Select value={category} onValueChange={setCategory}>
+                        <SelectTrigger>
+                            <SelectValue placeholder="All categories" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="all">All</SelectItem>
+                            {/* Replace with real categories if your API provides them */}
+                            <SelectItem value="Fiction">Fiction</SelectItem>
+                            <SelectItem value="Nonfiction">
+                                Nonfiction
+                            </SelectItem>
+                            <SelectItem value="Sci-Fi">Sci-Fi</SelectItem>
+                            <SelectItem value="Fantasy">Fantasy</SelectItem>
+                        </SelectContent>
+                    </Select>
                 </div>
             </div>
 
-            {errMsg && (
-                <div className="mt-6">
-                    <Alert message={errMsg} />
+            {booksQ.isLoading ? (
+                <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                    {Array.from({ length: 9 }).map((_, i) => (
+                        <div key={i} className="rounded-xl border p-4">
+                            <Skeleton className="h-5 w-2/3" />
+                            <Skeleton className="mt-2 h-4 w-1/2" />
+                            <Skeleton className="mt-6 h-3 w-1/3" />
+                        </div>
+                    ))}
+                </div>
+            ) : books.length === 0 ? (
+                <EmptyState
+                    title="No books found"
+                    description="Try a different search query or category."
+                    actionLabel="Clear filters"
+                    onAction={() => {
+                        setQ("");
+                        setCategory("all");
+                    }}
+                />
+            ) : (
+                <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                    {books.map((b) => (
+                        <BookCard key={b.id} book={b} />
+                    ))}
                 </div>
             )}
-
-            <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-                {isLoading
-                    ? Array.from({ length: 9 }).map((_, i) => (
-                          <div
-                              key={i}
-                              className="rounded-xl border border-zinc-200 dark:border-zinc-800 p-4"
-                          >
-                              <Skeleton className="h-5 w-3/4" />
-                              <Skeleton className="mt-3 h-4 w-1/2" />
-                              <Skeleton className="mt-4 h-8 w-full" />
-                          </div>
-                      ))
-                    : books.map((b) => (
-                          <Link
-                              key={b._id}
-                              to={`/app/books/${b._id}`}
-                              className="block"
-                          >
-                              <BookCard book={b} />
-                          </Link>
-                      ))}
-            </div>
         </div>
     );
 }

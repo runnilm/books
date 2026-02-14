@@ -1,8 +1,8 @@
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { ThemeToggle } from "@/components/layout/ThemeToggle";
-import { useSidebar } from "@/components/layout/sidebar-context";
-import HeaderBookSearch from "@/components/HeaderBookSearch";
+import { useSidebar } from "./sidebar-context";
+import { BookCommand } from "../books/BookCommand";
 import { PanelLeft } from "lucide-react";
 import {
     DropdownMenu,
@@ -23,6 +23,7 @@ export function SiteHeader() {
     return (
         <header className="sticky top-0 z-40 border-b bg-background/80 backdrop-blur">
             <div className="flex h-14 w-full items-center gap-3 px-4">
+                {/* Left */}
                 <Button
                     variant="ghost"
                     size="icon"
@@ -34,10 +35,14 @@ export function SiteHeader() {
 
                 <Separator orientation="vertical" className="h-6" />
 
+                {/* Center */}
                 <div className="flex min-w-0 flex-1 justify-center">
-                    <HeaderBookSearch />
+                    <div className="w-full max-w-2xl">
+                        <BookCommand />
+                    </div>
                 </div>
 
+                {/* Right */}
                 <div className="flex items-center gap-2">
                     <ThemeToggle />
 
@@ -74,5 +79,3 @@ export function SiteHeader() {
         </header>
     );
 }
-
-export default SiteHeader;

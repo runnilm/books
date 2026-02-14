@@ -1,31 +1,36 @@
 import { useNavigate } from "react-router-dom";
-
-import { useAuth } from "@/auth/auth";
+import { useLogout, useMe } from "@/lib/auth";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 export function AccountPage() {
-    const { user, logout } = useAuth();
+    const me = useMe();
+    const logout = useLogout();
     const nav = useNavigate();
 
     return (
-        <div className="mx-auto max-w-2xl">
-            <h1 className="text-xl font-semibold">Account</h1>
-            <p className="mt-2 text-sm opacity-70">
-                Signed in as{" "}
-                <span className="font-medium">{user?.username ?? "—"}</span>
-            </p>
-
-            <div className="mt-6">
+        <Card>
+            <CardHeader>
+                <CardTitle className="text-base">Account</CardTitle>
+            </CardHeader>
+            <CardContent className="flex items-center justify-between gap-3">
+                <div className="text-sm text-muted-foreground">
+                    Signed in as{" "}
+                    <span className="font-medium text-foreground">
+                        {me.data?.user?.username}
+                    </span>
+                </div>
                 <Button
                     variant="destructive"
+                    disabled={logout.isPending}
                     onClick={async () => {
-                        await logout();
-                        nav("/login", { replace: true });
+                        await logout.mutateAsync();
+                        nav("/app/login", { replace: true });
                     }}
                 >
-                    Log out
+                    {logout.isPending ? "Logging out…" : "Logout"}
                 </Button>
-            </div>
-        </div>
+            </CardContent>
+        </Card>
     );
 }

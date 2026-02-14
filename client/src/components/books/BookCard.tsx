@@ -1,21 +1,31 @@
-import type { BookDTO } from "../../types/dto";
+import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import type { Book } from "@/types/api";
+import { Link } from "react-router-dom";
 
-export function BookCard({ book }: { book: BookDTO }) {
+export function BookCard({ book }: { book: Book }) {
     return (
-        <div className="rounded-xl border border-zinc-200 dark:border-zinc-800 p-4 hover:bg-zinc-50 dark:hover:bg-zinc-900 transition">
-            <div className="text-base font-semibold leading-snug">
-                {book.title}
-            </div>
-            <div className="mt-1 text-sm opacity-80">{book.author}</div>
-
-            <div className="mt-3 flex flex-wrap gap-2 text-xs">
-                <span className="rounded-full bg-zinc-100 dark:bg-zinc-900 px-2 py-1">
-                    {book.category}
-                </span>
-                <span className="rounded-full bg-zinc-100 dark:bg-zinc-900 px-2 py-1">
-                    ISBN: {book.isbn}
-                </span>
-            </div>
-        </div>
+        <Link to={`/app/books/${book.id}`}>
+            <Card className="transition-colors hover:bg-accent/40">
+                <CardContent className="p-4">
+                    <div className="flex items-start justify-between gap-2">
+                        <div className="min-w-0">
+                            <div className="truncate font-medium">
+                                {book.title}
+                            </div>
+                            <div className="truncate text-sm text-muted-foreground">
+                                {book.author}
+                            </div>
+                        </div>
+                        <Badge variant="secondary" className="shrink-0">
+                            {book.category}
+                        </Badge>
+                    </div>
+                    <div className="mt-3 text-xs text-muted-foreground">
+                        ISBN: {book.isbn}
+                    </div>
+                </CardContent>
+            </Card>
+        </Link>
     );
 }

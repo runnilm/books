@@ -1,113 +1,87 @@
-import { useMemo, useState } from "react";
+import { useState } from "react";
+import type { FormEvent } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-
-import { useAuth } from "@/auth/auth";
-import { ApiError } from "@/api/fetchJson";
-import { getSearchParam } from "@/lib/query";
-import { Alert } from "@/components/ui/alert";
-import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
+import { useLogin } from "@/lib/auth";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
 
 export function LoginPage() {
-    const { login } = useAuth();
     const nav = useNavigate();
     const loc = useLocation();
 
-    const next = useMemo(
-        () => getSearchParam(loc.search, "next") ?? "/app/books",
-        [loc.search],
-    );
+    const sp = new URLSearchParams(loc.search);
+    const rawNext = sp.get("next") ?? "";
+    const from = rawNext.startsWith("/app/") ? rawNext : "/app/books";
 
+    const login = useLogin();
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
 
-    const [isSubmitting, setIsSubmitting] = useState(false);
-    const [error, setError] = useState<string | null>(null);
-
-    async function onSubmit(e: React.FormEvent) {
-        e.preventDefault();
-        setError(null);
-
-        if (!username.trim() || !password) {
-            setError("Username and password are required.");
-            return;
+    const getErrorMessage = (err: unknown): string => {
+        if (err instanceof Error) return err.message;
+        if (typeof err === "string") return err;
+        if (typeof err === "object" && err && "message" in err) {
+            return String((err as { message: unknown }).message);
         }
+        return "Login failed";
+    };
 
-        setIsSubmitting(true);
+    async function onSubmit(e: FormEvent) {
+        e.preventDefault();
         try {
-            await login({ username: username.trim(), password });
-            nav(next, { replace: true });
-        } catch (err) {
-            if (err instanceof ApiError) {
-                if (err.status === 401) setError("Invalid credentials.");
-                else setError(err.message || "Login failed.");
-            } else {
-                setError("Login failed.");
-            }
-        } finally {
-            setIsSubmitting(false);
+            await login.mutateAsync({ username, password });
+            nav(from, { replace: true });
+        } catch (err: unknown) {
+            toast.error(getErrorMessage(err));
         }
     }
 
     return (
-        <div className="min-h-[60vh] grid place-items-center py-10">
-            <div className="w-full max-w-sm rounded-xl border p-6">
-                <h1 className="text-xl font-semibold">Login</h1>
-                <p className="text-sm opacity-70 mt-1">
-                    Use your username and password.
-                </p>
-
-                {error && (
-                    <div className="mt-4">
-                        <Alert title="Login error" message={error} />
-                    </div>
-                )}
-
-                <form className="mt-4 space-y-3" onSubmit={onSubmit}>
-                    <div>
-                        <label className="text-sm font-medium">Username</label>
-                        <div className="mt-1">
+        <div className="min-h-dvh flex items-center justify-center p-4">
+            <Card className="w-full max-w-md">
+                <CardHeader>
+                    <CardTitle>Login</CardTitle>
+                </CardHeader>
+                <CardContent>
+                    <form className="space-y-4" onSubmit={onSubmit}>
+                        <div className="space-y-2">
+                            <Label htmlFor="u">Username</Label>
                             <Input
-                                autoComplete="username"
+                                id="u"
                                 value={username}
                                 onChange={(e) => setUsername(e.target.value)}
-                                disabled={isSubmitting}
+                                autoComplete="username"
                             />
                         </div>
-                    </div>
-
-                    <div>
-                        <label className="text-sm font-medium">Password</label>
-                        <div className="mt-1">
+                        <div className="space-y-2">
+                            <Label htmlFor="p">Password</Label>
                             <Input
+                                id="p"
                                 type="password"
-                                autoComplete="current-password"
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
-                                disabled={isSubmitting}
+                                autoComplete="current-password"
                             />
                         </div>
-                    </div>
-
-                    <Button
-                        type="submit"
-                        className="w-full"
-                        disabled={isSubmitting}
-                    >
-                        {isSubmitting ? "Logging in…" : "Login"}
-                    </Button>
-                </form>
-
-                <div className="mt-4 text-sm opacity-80">
-                    No account?{" "}
-                    <Link
-                        className="underline hover:opacity-100"
-                        to={`/register?next=${encodeURIComponent(next)}`}
-                    >
-                        Register
-                    </Link>
-                </div>
-            </div>
+                        <Button
+                            className="w-full"
+                            type="submit"
+                            disabled={login.isPending}
+                        >
+                            {login.isPending ? "Signing in…" : "Sign in"}
+                        </Button>
+                        <div className="text-sm text-muted-foreground">
+                            No account?{" "}
+                            <Link className="underline" to="/app/register">
+                                Register
+                            </Link>
+                        </div>
+                    </form>
+                </CardContent>
+            </Card>
         </div>
     );
 }

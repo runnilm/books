@@ -47,7 +47,7 @@ async function main() {
     // services
     const auth = authService({ users, collections });
     const books = booksService({ booksRepo, reviewsRepo, collectionBooks });
-    const reviews = reviewsService({ booksRepo, reviewsRepo });
+    const reviews = reviewsService({ booksRepo, reviewsRepo, users });
     const userCollections = collectionsService({
         collections,
         collectionBooks,

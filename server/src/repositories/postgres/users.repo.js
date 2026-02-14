@@ -22,5 +22,22 @@ export function usersRepo(pgPool) {
                 isAdmin,
             ]);
         },
+
+        async findByIds(userIds) {
+            const ids = Array.from(
+                new Set(
+                    (userIds ?? [])
+                        .map((x) => Number(x))
+                        .filter((x) => Number.isFinite(x)),
+                ),
+            );
+            if (ids.length === 0) return [];
+
+            const r = await pgPool.query(
+                "SELECT id, username, is_admin FROM users WHERE id = ANY($1::int[])",
+                [ids],
+            );
+            return r.rows;
+        },
     };
 }
