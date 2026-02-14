@@ -1,9 +1,17 @@
 export function reviewsController({ reviews }) {
     return {
         list: async (req, res) => {
-            const items = await reviews.list({ bookId: req.params.id });
+            const result = await reviews.list({ bookId: req.params.id });
             res.json({
-                reviews: items,
+                reviews: result.reviews,
+                ratings: result.ratings,
+            });
+        },
+
+        ratings: async (req, res) => {
+            const result = await reviews.ratings({ bookId: req.params.id });
+            res.json({
+                ratings: result,
             });
         },
 
@@ -16,6 +24,14 @@ export function reviewsController({ reviews }) {
             res.status(result.created ? 201 : 200).json({
                 review: result.review,
             });
+        },
+
+        removeMine: async (req, res) => {
+            await reviews.removeMine({
+                bookId: req.params.id,
+                userId: req.session.user.id,
+            });
+            res.status(204).end();
         },
     };
 }

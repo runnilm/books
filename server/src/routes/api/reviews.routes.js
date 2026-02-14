@@ -13,6 +13,7 @@ export function reviewsRoutes({ controller }) {
     const router = Router();
 
     router.get("/:id/reviews", asyncHandler(controller.list));
+    router.get("/:id/ratings", asyncHandler(controller.ratings));
 
     router.post(
         "/:id/reviews",
@@ -21,6 +22,12 @@ export function reviewsRoutes({ controller }) {
             req.validated = { body: validate(createBody, req.body) };
             return controller.add(req, res);
         }),
+    );
+
+    router.delete(
+        "/:id/reviews/me",
+        requireAuth,
+        asyncHandler(controller.removeMine),
     );
 
     return router;

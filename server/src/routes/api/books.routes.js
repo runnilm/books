@@ -46,6 +46,8 @@ export function booksRoutes({ controller }) {
         }),
     );
 
+    router.get("/:id", asyncHandler(controller.getById));
+
     router.post(
         "/",
         requireAdmin,
