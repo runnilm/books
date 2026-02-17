@@ -22,6 +22,8 @@ import { booksController } from "./controllers/books.controller.js";
 import { reviewsController } from "./controllers/reviews.controller.js";
 import { collectionsController } from "./controllers/collections.controller.js";
 
+import { adminBooksController } from "./controllers/adminBooks.controller.js";
+
 import { buildRoutes } from "./routes/index.js";
 
 async function main() {
@@ -52,6 +54,7 @@ async function main() {
         collections,
         collectionBooks,
         booksRepo,
+        reviewsRepo,
     });
 
     // controllers
@@ -60,6 +63,7 @@ async function main() {
         books: booksController({ books }),
         reviews: reviewsController({ reviews }),
         collections: collectionsController({ collections: userCollections }),
+        adminBooks: adminBooksController({ books }),
     };
 
     // routes

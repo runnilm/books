@@ -10,18 +10,44 @@ const { Pool } = pg;
 async function seedPostgres(pool) {
     const username = process.env.SEED_ADMIN_USERNAME || "admin";
     const password = process.env.SEED_ADMIN_PASSWORD || "admin123!";
-
-    // create admin if missing
     const passwordHash = await bcrypt.hash(password, 10);
-    await pool.query(
-        `
-        INSERT INTO users (username, password_hash, is_admin)
-        VALUES ($1, $2, true)
-        ON CONFLICT (username)
-        DO UPDATE SET is_admin = true
-        `,
-        [username, passwordHash],
-    );
+
+    const client = await pool.connect();
+    try {
+        await client.query("BEGIN");
+
+        const { rows } = await client.query(
+            `
+            INSERT INTO users (username, password_hash, is_admin)
+            VALUES ($1, $2, true)
+            ON CONFLICT (username)
+            DO UPDATE SET
+                password_hash = EXCLUDED.password_hash,
+                is_admin = true
+            RETURNING id
+            `,
+            [username, passwordHash],
+        );
+
+        const adminId = rows[0]?.id;
+        if (!adminId) throw new Error("Failed to upsert admin user.");
+
+        await client.query(
+            `
+            INSERT INTO user_collections (user_id, name)
+            VALUES ($1, 'My Library')
+            ON CONFLICT (user_id, name) DO NOTHING
+            `,
+            [adminId],
+        );
+
+        await client.query("COMMIT");
+    } catch (err) {
+        await client.query("ROLLBACK");
+        throw err;
+    } finally {
+        client.release();
+    }
 }
 
 async function seedMongo() {

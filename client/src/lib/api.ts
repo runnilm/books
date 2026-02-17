@@ -21,7 +21,6 @@ function isAuthEndpoint(input: RequestInfo): boolean {
               ? input.url
               : "";
 
-    // keep this strict; only affect login/register UX
     return (
         url.includes("/api/auth/login") || url.includes("/api/auth/register")
     );
@@ -43,7 +42,6 @@ async function parseError(
             message = data.message;
         }
     } catch {
-        // If not JSON, try plain text (best-effort)
         try {
             const txt = (await res.text())?.trim();
             if (txt) message = txt;

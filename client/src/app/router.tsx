@@ -6,6 +6,7 @@ import { RegisterPage } from "@/pages/RegisterPage";
 import { BooksPage } from "@/pages/BooksPage";
 import { BookDetailPage } from "@/pages/BookDetailPage";
 import { AccountPage } from "@/pages/AccountPage";
+import { LibraryPage } from "@/pages/LibraryPage";
 
 export const router = createBrowserRouter([
     { path: "/", element: <Navigate to="/app/books" replace /> },
@@ -23,6 +24,7 @@ export const router = createBrowserRouter([
         children: [
             { path: "books", element: <BooksPage /> },
             { path: "books/:id", element: <BookDetailPage /> },
+            { path: "library", element: <LibraryPage /> },
             { path: "account", element: <AccountPage /> },
             { index: true, element: <Navigate to="/app/books" replace /> },
         ],

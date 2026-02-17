@@ -18,4 +18,14 @@ export const API = {
         deleteMineForBook: (bookId: string) =>
             `/api/books/${bookId}/reviews/me`,
     },
+    collections: {
+        list: "/api/collections",
+        create: "/api/collections",
+        listBooks: (collectionId: number) =>
+            `/api/collections/${collectionId}/books`,
+        addBook: (collectionId: number) =>
+            `/api/collections/${collectionId}/books`,
+        removeBook: (collectionId: number, bookId: string) =>
+            `/api/collections/${collectionId}/books/${bookId}`,
+    },
 } as const;

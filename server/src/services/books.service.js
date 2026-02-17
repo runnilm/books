@@ -64,7 +64,14 @@ export function booksService({ booksRepo, reviewsRepo, collectionBooks }) {
             if (!mongoose.isValidObjectId(id))
                 throw new ApiError(400, "Invalid book ID.");
 
-            const updated = await booksRepo.updateById(id, patch);
+            let updated;
+            try {
+                updated = await booksRepo.updateById(id, patch);
+            } catch (err) {
+                if (err?.code === 11000)
+                    throw new ApiError(409, "ISBN already exists.");
+                throw err;
+            }
             if (!updated) throw new ApiError(404, "Not found.");
 
             const stats = await reviewsRepo.statsByBookId(id);

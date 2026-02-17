@@ -7,4 +7,8 @@ export const qk = {
     bookCategories: ["bookCategories"] as const,
 
     reviews: (bookId: string) => ["reviews", bookId] as const,
-};
+
+    collections: ["collections"] as const,
+    collectionBooks: (collectionId: number) =>
+        ["collectionBooks", collectionId] as const,
+} as const;

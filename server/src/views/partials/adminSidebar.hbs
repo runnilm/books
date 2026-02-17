@@ -1,0 +1,36 @@
+<aside class="sticky top-16 hidden h-[calc(100dvh-4rem)] w-60 shrink-0 lg:block">
+	<nav class="flex w-60 flex-col gap-1">
+		<a {{#if (eq activeNav "books")}}{{/if}} class="flex items-center gap-2 rounded-lg px-3 py-2 text-sm transition-colors hover:bg-accent hover:text-accent-foreground {{#if (eq activeNav "books")}}bg-accent text-accent-foreground{{/if}}" href="/app/books">
+			<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-book-open h-4 w-4">
+				<path d="M12 7v14"></path>
+				<path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z"></path>
+			</svg>
+			<span class="truncate">Books</span>
+		</a>
+
+		<a {{#if (eq activeNav "library")}}{{/if}} class="flex items-center gap-2 rounded-lg px-3 py-2 text-sm transition-colors hover:bg-accent hover:text-accent-foreground {{#if (eq activeNav "library")}}bg-accent text-accent-foreground{{/if}}" href="/app/library">
+			<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-library h-4 w-4">
+				<path d="m16 6 4 14"></path>
+				<path d="M12 6v14"></path>
+				<path d="M8 8v12"></path>
+				<path d="M4 4v16"></path>
+			</svg>
+			<span class="truncate">My Library</span>
+		</a>
+
+		<a {{#if (eq activeNav "account")}}{{/if}} class="flex items-center gap-2 rounded-lg px-3 py-2 text-sm transition-colors hover:bg-accent hover:text-accent-foreground {{#if (eq activeNav "account")}}bg-accent text-accent-foreground{{/if}}" href="/app/account">
+			<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-user h-4 w-4">
+				<path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path>
+				<circle cx="12" cy="7" r="4"></circle>
+			</svg>
+			<span class="truncate">Account</span>
+		</a>
+
+		<a {{#if (eq activeNav "admin")}}{{/if}} href="/admin/books" class="mt-2 flex items-center gap-2 rounded-lg px-3 py-2 text-sm transition-colors hover:bg-accent hover:text-accent-foreground {{#if (eq activeNav "admin")}}bg-accent text-accent-foreground{{/if}}">
+			<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-shield h-4 w-4">
+				<path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"></path>
+			</svg>
+			<span class="truncate">Admin</span>
+		</a>
+	</nav>
+</aside>

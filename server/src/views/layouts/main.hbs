@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en" class="dark" style="color-scheme: dark;">
+
+<head>
+	<meta charset="UTF-8" />
+	<link rel="icon" type="image/png" href="/books.png" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+	<title>{{#if pageTitle}}{{pageTitle}}{{else}}Admin{{/if}}</title>
+
+	{{#if viteCssHref}}
+		<link rel="stylesheet" crossorigin href="{{viteCssHref}}" />
+	{{/if}}
+</head>
+
+<body>
+	<div class="min-h-dvh bg-background text-foreground">
+		{{> adminHeader}}
+
+		<div class="flex w-full gap-4 px-4 py-4">
+			{{> adminSidebar}}
+
+			<main class="min-w-0 flex-1">
+				{{> flash}}
+				{{{body}}}
+			</main>
+		</div>
+	</div>
+</body>
+
+</html>

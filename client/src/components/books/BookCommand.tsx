@@ -106,7 +106,7 @@ export function BookCommand() {
                                     {b.title}
                                 </div>
                                 <div className="truncate text-xs text-muted-foreground">
-                                    {b.author} • {b.isbn} • {b.category}
+                                    {b.author} - {b.isbn} - {b.category}
                                 </div>
                             </div>
                         </CommandItem>

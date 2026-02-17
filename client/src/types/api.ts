@@ -1,4 +1,9 @@
-export type User = { id: number; username: string };
+export type User = {
+    id: number;
+    username: string;
+    isAdmin?: boolean;
+    collectionId?: number | null;
+};
 
 export type Book = {
     id: string;

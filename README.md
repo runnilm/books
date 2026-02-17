@@ -1,91 +1,60 @@
 # Book Collection Manager
 
-- **Postgres** users, collections, collection membership
-- **MongoDB** global book catalog + reviews
-- Admins manage the catalog
-- Users maintain personal collections and leave one review per book
+## Features
 
----
+- **Postgres**: users, collections, and collection membership
+- **MongoDB**: book catalog and reviews/ratings
+- **User app (React)**:
+    - browse, search, and filter books
+    - manage your personal library ("My Library")
+    - add, update, and delete your review per book
+- **Admin app (Handlebars)**:
+    - add, edit, and delete books
+    - list, search, and filter books
+    - restricted to admin users
+- **Single server**: Express serves the API, Handlebars admin UI, and
+  built React app
+
+<small>**Note**: I modified the schema slightly and built this with a "global" book catalog that the admin modifies, and so user collections are modeled via a collection_books join table rather than having a collection_id on the book object.</small>
 
 ## Requirements
 
 - Docker
 
----
+## Setup (Docker)
 
-## Setup
+Create the environment file:
 
 ```bash
 cp .env.example .env
+```
+
+Build and run:
+
+```bash
 docker compose up --build
 ```
 
-Server runs at:
+## URLs
 
-```
-http://localhost:3000
-```
+React app:\
+http://localhost:3000/app/books
 
-Health check:
+My Library:\
+http://localhost:3000/app/library
 
-```bash
-curl http://localhost:3000/api/health
-```
+Admin:\
+http://localhost:3000/admin/books
 
----
+Health check:\
+http://localhost:3000/api/health
 
 ## Seeded Admin Account
 
-```
-username: admin
-password: admin123!
-```
+- username: `admin`\
+- password: `admin123!`
 
----
-
-## Main Endpoints
-
-### Auth
-
-```
-POST   /api/auth/register
-POST   /api/auth/login
-GET    /api/auth/me
-POST   /api/auth/logout
-```
-
-### Catalog (admin-only for write operations)
-
-```
-GET    /api/books
-GET    /api/books/search?q=
-POST   /api/books
-PUT    /api/books/:id
-DELETE /api/books/:id
-```
-
-### Collections
-
-```
-GET    /api/collections
-POST   /api/collections
-GET    /api/collections/:collectionId/books
-POST   /api/collections/:collectionId/books
-DELETE /api/collections/:collectionId/books/:bookId
-```
-
-### Reviews
-
-```
-GET    /api/books/:id/reviews
-POST   /api/books/:id/reviews
-```
-
-(One review per user per book.)
-
----
-
-## Reset Database
+## Reset databases
 
 ```bash
 docker compose down -v

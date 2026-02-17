@@ -5,6 +5,7 @@ export function collectionsService({
     collections,
     collectionBooks,
     booksRepo,
+    reviewsRepo,
 }) {
     return {
         async list({ userId }) {
@@ -42,10 +43,39 @@ export function collectionsService({
             if (ids.length === 0) return [];
 
             const validIds = ids.filter((id) => mongoose.isValidObjectId(id));
-            const docs = await booksRepo.findByIds(validIds);
+            if (validIds.length === 0) return [];
+
+            const [docs, statsMap] = await Promise.all([
+                booksRepo.findByIds(validIds),
+                reviewsRepo?.statsByBookIds
+                    ? reviewsRepo.statsByBookIds(validIds)
+                    : Promise.resolve(new Map()),
+            ]);
 
             const byId = new Map(docs.map((b) => [String(b._id), b]));
-            return rows.map((r) => byId.get(String(r.book_id))).filter(Boolean);
+
+            return rows
+                .map((r) => {
+                    const doc = byId.get(String(r.book_id));
+                    if (!doc) return null;
+
+                    const o =
+                        typeof doc.toObject === "function"
+                            ? doc.toObject()
+                            : doc;
+
+                    const stats = statsMap.get(String(o._id)) ?? {
+                        average: 0,
+                        count: 0,
+                    };
+
+                    return {
+                        ...o,
+                        averageRating: stats.average,
+                        ratingsCount: stats.count,
+                    };
+                })
+                .filter(Boolean);
         },
 
         async addBook({ userId, collectionId, bookId }) {

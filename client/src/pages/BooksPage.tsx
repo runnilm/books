@@ -77,7 +77,7 @@ export function BooksPage() {
     return (
         <div className="space-y-4">
             <div className="flex flex-col gap-3 sm:flex-row sm:items-end">
-                <div className="space-y-2 sm:flex-[2]">
+                <div className="space-y-2 sm:flex-2">
                     <Label htmlFor="q">Search</Label>
                     <Input
                         id="q"

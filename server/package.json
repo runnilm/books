@@ -15,14 +15,22 @@
     "type": "module",
     "private": "true",
     "dependencies": {
+        "@dr.pogodin/csurf": "^1.16.8",
         "bcrypt": "^6.0.0",
         "connect-pg-simple": "^10.0.0",
         "dotenv": "^17.2.4",
         "express": "^5.2.1",
+        "express-handlebars": "^8.0.6",
         "express-session": "^1.19.0",
         "helmet": "^8.1.0",
         "mongoose": "^9.1.6",
         "pg": "^8.18.0",
         "zod": "^4.3.6"
+    },
+    "devDependencies": {
+        "@types/bcrypt": "^6.0.0",
+        "@types/connect-pg-simple": "^7.0.3",
+        "@types/express": "^5.0.6",
+        "@types/express-session": "^1.18.2"
     }
 }

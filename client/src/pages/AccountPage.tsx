@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { useLogout, useMe } from "@/lib/auth";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { toast } from "sonner";
 
 export function AccountPage() {
@@ -11,9 +11,6 @@ export function AccountPage() {
 
     return (
         <Card>
-            <CardHeader>
-                <CardTitle className="text-base">Account</CardTitle>
-            </CardHeader>
             <CardContent className="flex items-center justify-between gap-3">
                 <div className="text-sm text-muted-foreground">
                     Signed in as{" "}

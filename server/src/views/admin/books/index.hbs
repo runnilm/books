@@ -1,0 +1,113 @@
+<div class="space-y-4">
+	<div class="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+		<form method="GET" action="/admin/books" class="flex flex-col gap-3 sm:flex-row sm:items-end sm:flex-1">
+			<div class="space-y-2 sm:flex-2">
+				<label data-slot="label" class="flex items-center gap-2 text-sm leading-none font-medium select-none group-data-[disabled=true]:pointer-events-none group-data-[disabled=true]:opacity-50 peer-disabled:cursor-not-allowed peer-disabled:opacity-50" for="q">Search</label>
+				<input data-slot="input" class="file:text-foreground placeholder:text-muted-foreground selection:bg-primary selection:text-primary-foreground dark:bg-input/30 border-input h-9 w-full min-w-0 rounded-md border bg-transparent px-3 py-1 text-base shadow-xs transition-[color,box-shadow] outline-none file:inline-flex file:h-7 file:border-0 file:bg-transparent file:text-sm file:font-medium disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] " id="q" name="q" placeholder="Title, author, ISBN, or category..." value="{{filters.q}}" />
+			</div>
+
+			<div class="space-y-2 sm:flex-1">
+				<label
+					data-slot="label"
+					class="flex items-center gap-2 text-sm leading-none font-medium select-none group-data-[disabled=true]:pointer-events-none group-data-[disabled=true]:opacity-50 peer-disabled:cursor-not-allowed peer-disabled:opacity-50"
+					for="category"
+				>
+					Category
+				</label>
+
+				<select
+					data-slot="input"
+					class="file:text-foreground placeholder:text-muted-foreground selection:bg-primary selection:text-primary-foreground dark:bg-input/30 border-input h-9 w-full min-w-0 rounded-md border bg-transparent px-3 py-1 text-base shadow-xs transition-[color,box-shadow] outline-none disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]"
+					id="category"
+					name="category"
+					onchange="this.form.requestSubmit();"
+					style="color-scheme: dark;"
+				>
+					<option
+						value="all"
+						style="background-color: #020817; color: #e5e7eb;"
+						{{#if (eq filters.category "all")}}selected{{/if}}
+					>
+						All
+					</option>
+
+					{{#each categories}}
+						<option
+							value="{{this}}"
+							style="background-color: #020817; color: #e5e7eb;"
+							{{#if (eq ../filters.category this)}}selected{{/if}}
+						>
+							{{this}}
+						</option>
+					{{/each}}
+				</select>
+			</div>
+
+			<div class="flex flex-wrap gap-2">
+				<button data-slot="button" data-variant="outline" data-size="default" class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] border bg-background shadow-xs hover:bg-accent hover:text-accent-foreground dark:bg-input/30 dark:border-input dark:hover:bg-input/50 h-9 px-4 py-2 has-[>svg]:px-3" type="submit">
+					Apply
+				</button>
+
+				<a data-slot="button" data-variant="ghost" data-size="default" class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] hover:bg-accent hover:text-accent-foreground dark:hover:bg-accent/50 h-9 py-2 has-[>svg]:px-3 px-2" href="/admin/books">
+					Clear
+				</a>
+			</div>
+		</form>
+
+		<a data-slot="button" data-variant="default" data-size="default" class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] bg-primary text-primary-foreground hover:bg-primary/90 h-9 px-4 py-2 has-[>svg]:px-3" href="/admin/books/new">
+			Add book
+		</a>
+	</div>
+
+	{{#if items.length}}
+		<div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+			{{#each items}}
+				<div data-slot="card" class="bg-card text-card-foreground flex flex-col gap-6 rounded-xl border py-6 shadow-sm transition-colors hover:bg-accent/40">
+					<div data-slot="card-content" class="p-4">
+						<div class="flex items-start justify-between gap-2">
+							<div class="min-w-0">
+								<div class="truncate font-medium">{{title}}</div>
+								<div class="truncate text-sm text-muted-foreground">{{author}}</div>
+							</div>
+
+							<span data-slot="badge" data-variant="secondary" class="inline-flex items-center justify-center rounded-full border border-transparent px-2 py-0.5 text-xs font-medium w-fit whitespace-nowrap [&>svg]:size-3 gap-1 [&>svg]:pointer-events-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] transition-[color,box-shadow] overflow-hidden bg-secondary text-secondary-foreground [a&]:hover:bg-secondary/90 shrink-0">{{category}}</span>
+						</div>
+
+						<div class="mt-3 flex items-center justify-between gap-2">
+							<div class="text-xs text-muted-foreground">ISBN: {{isbn}}</div>
+
+							<div class="flex items-center gap-2">
+								<a data-slot="button" data-variant="outline" data-size="icon" class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] border bg-background shadow-xs hover:bg-accent hover:text-accent-foreground dark:bg-input/30 dark:border-input dark:hover:bg-input/50 size-9" href="/admin/books/{{id}}/edit" title="Edit">
+									<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-pencil h-4 w-4">
+										<path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z"></path>
+										<path d="m15 5 4 4"></path>
+									</svg>
+								</a>
+
+								<form method="POST" action="/admin/books/{{id}}/delete" class="inline" onsubmit="return confirm('Delete this book?');">
+									<input type="hidden" name="_csrf" value="{{../csrfToken}}" />
+									<button data-slot="button" data-variant="destructive" data-size="icon" class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] bg-destructive text-white hover:bg-destructive/90 size-9" type="submit" title="Delete">
+										<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-trash-2 h-4 w-4">
+											<path d="M3 6h18"></path>
+											<path d="M8 6V4h8v2"></path>
+											<path d="M19 6l-1 14H6L5 6"></path>
+											<path d="M10 11v6"></path>
+											<path d="M14 11v6"></path>
+										</svg>
+									</button>
+								</form>
+							</div>
+						</div>
+					</div>
+				</div>
+			{{/each}}
+		</div>
+	{{else}}
+		<div data-slot="card" class="bg-card text-card-foreground flex flex-col gap-6 rounded-xl border py-6 shadow-sm">
+			<div data-slot="card-content" class="px-6 py-10 text-center space-y-2">
+				<div class="font-medium">No books found</div>
+				<div class="text-sm text-muted-foreground">Try a different search query or category.</div>
+			</div>
+		</div>
+	{{/if}}
+</div>
