@@ -51,7 +51,7 @@ http://localhost:3000/api/health
 
 ## Seeded Admin Account
 
-- username: `admin`\
+- username: `admin`
 - password: `admin123!`
 
 ## Reset databases
